@@ -2,9 +2,12 @@ import express, { NextFunction, Request, Response } from "express";
 import { userController } from "./user.controller";
 import { fileUploader } from "../../helper/fileUploader";
 import { UserValidation } from "./user.validation";
+import { UserRole } from "@prisma/client";
+import { auth } from "../../middlewares/auth";
 
 const router = express.Router();
 
+router.get("/", auth(UserRole.ADMIN), userController.getAllFromDB)
 router.post(
   "/createPatient",
   fileUploader.upload.single("file"),
@@ -17,6 +20,7 @@ router.post(
 );
 router.post(
   "/createDoctor",
+  auth(UserRole.ADMIN),
   fileUploader.upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = UserValidation.createDoctorValidationSchema.parse(
@@ -27,6 +31,7 @@ router.post(
 );
 router.post(
   "/createAdmin",
+  auth(UserRole.ADMIN),
   fileUploader.upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = UserValidation.createAdminValidationSchema.parse(

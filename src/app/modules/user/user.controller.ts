@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import catchAsync from "../../shared/catchAsync";
 import { UserService } from "./user.service";
 import sendResponse from "../../shared/sendResponse";
+import pick from "../../helper/pick";
 
 const createPatient = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -33,7 +34,6 @@ const createAdmin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
    
     const result = await UserService.createAdmin(req);
-    console.log("Admin", result);
 
     sendResponse(res, {
       statusCode: 201,
@@ -43,11 +43,28 @@ const createAdmin = catchAsync(
     });
   }
 );
+const getAllFromDB = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const filters = pick(req.query, ["status", "role", "email", "searchTerm"])
+    const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"])
+   
+    const result = await UserService.getAllFromDB(filters, options);
+
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Users retrieve successfully.",
+      meta:result.meta,
+      data: result.data,
+    });
+  }
+);
 
 export const userController = {
   createPatient,
   createDoctor,
-  createAdmin
+  createAdmin,
+  getAllFromDB,
 };
 
 
