@@ -6,7 +6,7 @@ import { auth } from "../../middlewares/auth";
 const router = express.Router();
 
 router.get("/", auth(UserRole.DOCTOR, UserRole.ADMIN), ScheduleController.schedulesForDoctor);
-router.post("/", ScheduleController.insertIntoDB);
-router.delete("/:id", ScheduleController.deleteSchedulesFromDB);
+router.post("/", auth(UserRole.ADMIN), ScheduleController.insertIntoDB);
+router.delete("/:id", auth(UserRole.ADMIN), ScheduleController.deleteSchedulesFromDB);
 
 export const scheduleRoutes = router;
